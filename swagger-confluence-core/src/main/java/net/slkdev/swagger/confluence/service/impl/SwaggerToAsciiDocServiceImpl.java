@@ -17,7 +17,6 @@ package net.slkdev.swagger.confluence.service.impl;
 
 import io.github.swagger2markup.*;
 import io.github.swagger2markup.builder.Swagger2MarkupConfigBuilder;
-import io.github.swagger2markup.markup.builder.MarkupLanguage;
 import net.slkdev.swagger.confluence.exception.SwaggerConfluenceConfigurationException;
 import net.slkdev.swagger.confluence.exception.SwaggerConfluenceInternalSystemException;
 import net.slkdev.swagger.confluence.service.SwaggerToAsciiDocService;
