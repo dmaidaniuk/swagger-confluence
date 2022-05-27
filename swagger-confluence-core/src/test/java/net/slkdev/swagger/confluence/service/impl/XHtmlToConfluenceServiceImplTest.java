@@ -19,6 +19,7 @@ import net.slkdev.swagger.confluence.config.SwaggerConfluenceConfig;
 import net.slkdev.swagger.confluence.constants.PaginationMode;
 import net.slkdev.swagger.confluence.service.XHtmlToConfluenceService;
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.lang3.StringUtils;
 import org.asciidoctor.internal.IOUtils;
 import org.junit.Before;
 import org.junit.Test;
@@ -83,7 +84,7 @@ public class XHtmlToConfluenceServiceImplTest {
 		);
 
         when(restTemplate.exchange(any(URI.class), eq(HttpMethod.GET),
-                any(RequestEntity.class), eq(String.class))).thenReturn(responseEntity,
+                any(HttpEntity.class), eq(String.class))).thenReturn(responseEntity,
                 responseEntity);
 		when(restTemplate.exchange(any(URI.class), eq(HttpMethod.POST),
 				any(HttpEntity.class), eq(String.class))).thenReturn(responseEntity);
@@ -95,7 +96,7 @@ public class XHtmlToConfluenceServiceImplTest {
 		xHtmlToConfluenceService.postXHtmlToConfluence(swaggerConfluenceConfig, xhtml);
 
 		verify(restTemplate, times(2)).exchange(any(URI.class), eq(HttpMethod.GET),
-				any(RequestEntity.class), eq(String.class));
+				any(HttpEntity.class), eq(String.class));
 		verify(restTemplate).exchange(any(URI.class), eq(HttpMethod.POST),
 				httpEntityCaptor.capture(), eq(String.class));
 
@@ -107,7 +108,7 @@ public class XHtmlToConfluenceServiceImplTest {
 		);
 
 		assertNotNull("Failed to Capture RequestEntity for POST", capturedHttpEntity);
-		assertEquals("Unexpected JSON Post Body", expectedPostBody, capturedHttpEntity.getBody());
+		assertEquals("Unexpected JSON Post Body", expectedPostBody, normalizeLineSeparator(capturedHttpEntity.getBody()));
 	}
 
 	@Test
@@ -123,17 +124,17 @@ public class XHtmlToConfluenceServiceImplTest {
 		final ResponseEntity<String> postResponseEntity = new ResponseEntity<>(POST_RESPONSE, HttpStatus.OK);
 
 		when(restTemplate.exchange(any(URI.class), eq(HttpMethod.GET),
-				any(RequestEntity.class), eq(String.class))).thenReturn(responseEntity);
+				any(HttpEntity.class), eq(String.class))).thenReturn(responseEntity);
 		when(responseEntity.getBody()).thenReturn(GET_RESPONSE_FOUND);
 		when(restTemplate.exchange(any(URI.class), eq(HttpMethod.PUT),
-				any(RequestEntity.class), eq(String.class))).thenReturn(postResponseEntity);
+				any(HttpEntity.class), eq(String.class))).thenReturn(postResponseEntity);
 
         final ArgumentCaptor<HttpEntity> httpEntityCaptor = ArgumentCaptor.forClass(HttpEntity.class);
 
 		xHtmlToConfluenceService.postXHtmlToConfluence(swaggerConfluenceConfig, xhtml);
 
         verify(restTemplate).exchange(any(URI.class), eq(HttpMethod.GET),
-				any(RequestEntity.class), eq(String.class));
+				any(HttpEntity.class), eq(String.class));
 		verify(restTemplate).exchange(any(URI.class), eq(HttpMethod.PUT),
                 httpEntityCaptor.capture(), eq(String.class));
 
@@ -145,7 +146,7 @@ public class XHtmlToConfluenceServiceImplTest {
         );
 
         assertNotNull("Failed to Capture RequestEntity for POST", capturedHttpEntity);
-        assertEquals("Unexpected JSON Post Body", expectedPostBody, capturedHttpEntity.getBody());
+        assertEquals("Unexpected JSON Post Body", expectedPostBody, normalizeLineSeparator(capturedHttpEntity.getBody()));
 	}
 
 	@Test
@@ -160,7 +161,7 @@ public class XHtmlToConfluenceServiceImplTest {
 
 		for(int i = 0; i < 5; i++) {
 			when(restTemplate.exchange(any(URI.class), eq(HttpMethod.GET),
-					any(RequestEntity.class), eq(String.class))).thenReturn(responseEntity);
+					any(HttpEntity.class), eq(String.class))).thenReturn(responseEntity);
 			when(responseEntity.getBody()).thenReturn(GET_RESPONSE_NOT_FOUND);
 			when(restTemplate.exchange(any(URI.class), eq(HttpMethod.POST),
 					any(HttpEntity.class), eq(String.class))).thenReturn(responseEntity);
@@ -172,7 +173,7 @@ public class XHtmlToConfluenceServiceImplTest {
 		xHtmlToConfluenceService.postXHtmlToConfluence(swaggerConfluenceConfig, xhtml);
 
 		verify(restTemplate, times(5)).exchange(any(URI.class), eq(HttpMethod.GET),
-				any(RequestEntity.class), eq(String.class));
+				any(HttpEntity.class), eq(String.class));
 		verify(restTemplate, times(5)).exchange(any(URI.class), eq(HttpMethod.POST),
 				httpEntityCaptor.capture(), eq(String.class));
 
@@ -183,10 +184,10 @@ public class XHtmlToConfluenceServiceImplTest {
 						"/swagger-confluence-create-json-body-definitions-example.json")
 		);
 
-		assertNotNull("Failed to Capture RequeestEntity for POST", capturedHttpEntity);
+		assertNotNull("Failed to Capture RequestEntity for POST", capturedHttpEntity);
 		// We'll do a full check on the last page versus a resource; not doing all of them as it
 		// would be a pain to maintain, but this should give us a nod of confidence.
-		assertEquals("Unexpected JSON Post Body", expectedPostBody, capturedHttpEntity.getBody());
+		assertEquals("Unexpected JSON Post Body", expectedPostBody, normalizeLineSeparator(capturedHttpEntity.getBody()));
 	}
 
 	@Test
@@ -203,10 +204,10 @@ public class XHtmlToConfluenceServiceImplTest {
 
 		for(int i = 0; i < 5; i++) {
 			when(restTemplate.exchange(any(URI.class), eq(HttpMethod.GET),
-					any(RequestEntity.class), eq(String.class))).thenReturn(responseEntity);
+					any(HttpEntity.class), eq(String.class))).thenReturn(responseEntity);
 			when(responseEntity.getBody()).thenReturn(GET_RESPONSE_FOUND);
 			when(restTemplate.exchange(any(URI.class), eq(HttpMethod.PUT),
-					any(RequestEntity.class), eq(String.class))).thenReturn(postResponseEntity);
+					any(HttpEntity.class), eq(String.class))).thenReturn(postResponseEntity);
 		}
 
         final ArgumentCaptor<HttpEntity> httpEntityCaptor = ArgumentCaptor.forClass(HttpEntity.class);
@@ -214,7 +215,7 @@ public class XHtmlToConfluenceServiceImplTest {
 		xHtmlToConfluenceService.postXHtmlToConfluence(swaggerConfluenceConfig, xhtml);
 
 		verify(restTemplate, times(5)).exchange(any(URI.class), eq(HttpMethod.GET),
-				any(RequestEntity.class), eq(String.class));
+				any(HttpEntity.class), eq(String.class));
         verify(restTemplate, times(5)).exchange(any(URI.class), eq(HttpMethod.PUT),
                 httpEntityCaptor.capture(), eq(String.class));
 
@@ -228,7 +229,7 @@ public class XHtmlToConfluenceServiceImplTest {
         assertNotNull("Failed to Capture RequeestEntity for POST", capturedHttpEntity);
         // We'll do a full check on the last page versus a resource; not doing all of them as it
         // would be a pain to maintain, but this should give us a nod of confidence.
-        assertEquals("Unexpected JSON Post Body", expectedPostBody, capturedHttpEntity.getBody());
+        assertEquals("Unexpected JSON Post Body", expectedPostBody, normalizeLineSeparator(capturedHttpEntity.getBody()));
 	}
 
     @Test
@@ -243,7 +244,7 @@ public class XHtmlToConfluenceServiceImplTest {
 
         for(int i = 0; i < 31; i++) {
             when(restTemplate.exchange(any(URI.class), eq(HttpMethod.GET),
-                    any(RequestEntity.class), eq(String.class))).thenReturn(responseEntity);
+                    any(HttpEntity.class), eq(String.class))).thenReturn(responseEntity);
             when(responseEntity.getBody()).thenReturn(GET_RESPONSE_NOT_FOUND);
             when(restTemplate.exchange(any(URI.class), eq(HttpMethod.POST),
                     any(HttpEntity.class), eq(String.class))).thenReturn(responseEntity);
@@ -255,7 +256,7 @@ public class XHtmlToConfluenceServiceImplTest {
         xHtmlToConfluenceService.postXHtmlToConfluence(swaggerConfluenceConfig, xhtml);
 
         verify(restTemplate, times(34)).exchange(any(URI.class), eq(HttpMethod.GET),
-                any(RequestEntity.class), eq(String.class));
+                any(HttpEntity.class), eq(String.class));
         verify(restTemplate, times(34)).exchange(any(URI.class), eq(HttpMethod.POST),
                 httpEntityCaptor.capture(), eq(String.class));
 
@@ -269,7 +270,7 @@ public class XHtmlToConfluenceServiceImplTest {
         assertNotNull("Failed to Capture RequestEntity for POST", capturedHttpEntity);
         // We'll do a full check on the last page versus a resource; not doing all of them as it
         // would be a pain to maintain, but this should give us a nod of confidence.
-        assertEquals("Unexpected JSON Post Body", expectedPostBody, capturedHttpEntity.getBody());
+        assertEquals("Unexpected JSON Post Body", expectedPostBody, normalizeLineSeparator(capturedHttpEntity.getBody()));
     }
 
     @Test
@@ -287,7 +288,7 @@ public class XHtmlToConfluenceServiceImplTest {
         final List<String> returnJson = new ArrayList<>();
 
         when(restTemplate.exchange(any(URI.class), eq(HttpMethod.GET),
-                any(RequestEntity.class), eq(String.class))).thenReturn(responseEntity);
+                any(HttpEntity.class), eq(String.class))).thenReturn(responseEntity);
 
         for(int i = 0; i < 34; i++) {
             if(i > 0) {
@@ -305,18 +306,18 @@ public class XHtmlToConfluenceServiceImplTest {
         when(responseEntity.getBody()).thenReturn(GET_RESPONSE_FOUND, returnJsonArray);
 
         when(restTemplate.exchange(any(URI.class), eq(HttpMethod.DELETE),
-                any(RequestEntity.class), eq(String.class))).thenReturn(responseEntity);
+                any(HttpEntity.class), eq(String.class))).thenReturn(responseEntity);
         when(responseEntity.getStatusCode()).thenReturn(HttpStatus.NO_CONTENT);
 
         when(restTemplate.exchange(any(URI.class), eq(HttpMethod.PUT),
-                any(RequestEntity.class), eq(String.class))).thenReturn(postResponseEntity);
+                any(HttpEntity.class), eq(String.class))).thenReturn(postResponseEntity);
 
         final ArgumentCaptor<HttpEntity> httpEntityCaptor = ArgumentCaptor.forClass(HttpEntity.class);
 
         xHtmlToConfluenceService.postXHtmlToConfluence(swaggerConfluenceConfig, xhtml);
 
         verify(restTemplate, times(38)).exchange(any(URI.class), eq(HttpMethod.GET),
-                any(RequestEntity.class), eq(String.class));
+                any(HttpEntity.class), eq(String.class));
         verify(restTemplate, times(34)).exchange(any(URI.class), eq(HttpMethod.PUT),
                 httpEntityCaptor.capture(), eq(String.class));
 
@@ -330,7 +331,7 @@ public class XHtmlToConfluenceServiceImplTest {
         assertNotNull("Failed to Capture RequestEntity for POST", capturedHttpEntity);
         // We'll do a full check on the last page versus a resource; not doing all of them as it
         // would be a pain to maintain, but this should give us a nod of confidence.
-        assertEquals("Unexpected JSON Post Body", expectedPostBody, capturedHttpEntity.getBody());
+        assertEquals("Unexpected JSON Post Body", expectedPostBody, normalizeLineSeparator(capturedHttpEntity.getBody()));
     }
 
     private SwaggerConfluenceConfig getTestSwaggerConfluenceConfig(){
@@ -352,5 +353,12 @@ public class XHtmlToConfluenceServiceImplTest {
 		final byte[] base64CredsBytes = Base64.encodeBase64(plainCredsBytes);
 		return new String(base64CredsBytes);
 	}
+
+    private String normalizeLineSeparator(String input) {
+        if (input != null && input.contains("\\r")) {
+            input = StringUtils.replace(input, "\\r", "");
+        }
+        return input;
+    }
 
 }
