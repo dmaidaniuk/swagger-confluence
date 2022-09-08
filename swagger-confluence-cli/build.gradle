@@ -1,14 +1,12 @@
 buildscript {
     repositories {
         mavenLocal()
-        maven {
-            url "https://plugins.gradle.org/m2/"
-        }
         jcenter()
         mavenCentral()
+        gradlePluginPortal()
     }
     dependencies {
-        classpath 'com.github.jengelman.gradle.plugins:shadow:1.2.3'
+        classpath 'com.github.johnrengelman.shadow:com.github.johnrengelman.shadow.gradle.plugin:7.1.2'
         classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.6'
     }
 }
@@ -54,11 +52,13 @@ bintray {
 evaluationDependsOn(':swagger-confluence-core')
 
 dependencies {
-    compile (project(':swagger-confluence-core'))
-    compile "commons-cli:commons-cli:$COMMONS_CLI"
+    implementation (project(':swagger-confluence-core'))
+    implementation "org.springframework:spring-context:$SPRING_VERSION"
+    implementation "commons-cli:commons-cli:$COMMONS_CLI"
+    implementation "org.apache.commons:commons-lang3:$COMMONS_LANG3"
 
-    testCompile "junit:junit:$JUNIT_VERSION"
-    testCompile "org.mockito:mockito-core:$MOCKITO_VERSION"
+    testImplementation "junit:junit:$JUNIT_VERSION"
+    testImplementation "org.mockito:mockito-core:$MOCKITO_VERSION"
 }
 
 publishing {
@@ -71,8 +71,8 @@ publishing {
                 classifier "sources"
             }
         }
-		myShadowPublication(MavenPublication) {
-			from components.shadow
+        shadow(MavenPublication) { publication ->
+            from project.shadow.component(publication)
             artifactId = 'swagger-confluence-cli-all'
 
             artifact sourceJar {

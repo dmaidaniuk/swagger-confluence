@@ -39,8 +39,8 @@ bintray {
 evaluationDependsOn(':swagger-confluence-core')
 
 dependencies {
-    compile (project(':swagger-confluence-core'))
-    compile gradleApi()
+    implementation (project(':swagger-confluence-core'))
+    implementation gradleApi()
 }
 
 publishing {
