@@ -39,9 +39,11 @@ dependencies {
     implementation "io.github.swagger2markup:swagger2markup:$SWAGGER2MARKUP_VERSION"
     implementation "org.springframework:spring-core:$SPRING_VERSION"
     implementation "org.springframework:spring-web:$SPRING_VERSION"
+    implementation "org.springframework:spring-context:$SPRING_VERSION"
     implementation "org.asciidoctor:asciidoctorj:$ASCIIDOCTORJ_VERSION"
     implementation "com.jayway.jsonpath:json-path:$JSONPATH_VERSION"
     implementation "org.jsoup:jsoup:$JSOUP_VERSION"
+    implementation "com.fasterxml.jackson.core:jackson-databind:$JACKSON_DATABIND_VERSION"
 
     implementation "org.apache.logging.log4j:log4j-core:$LOG4J2_VERSION"
     implementation "org.apache.logging.log4j:log4j-slf4j-impl:$LOG4J2_VERSION"
